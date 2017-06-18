@@ -1,0 +1,42 @@
+#!/usr/bin/env python3
+import sys
+from analyzer import Analyzer
+from helpers import *
+from termcolor import colored
+
+def main():
+    
+    #Error handling: improper command line call
+    if (len(sys.argv) != 2):
+        print ("Usage: python tweets twitter_handle")
+        return 1;
+     
+    #Files containing positive/negative words   
+    positives = os.path.join(sys.path[0], "positive-words.txt")
+    negatives = os.path.join(sys.path[0], "negative-words.txt")
+    
+    #Create analyzer instance
+    analyzer = Analyzer(positives, negatives)
+
+    handle = sys.argv[1]
+    listTweets = get_user_timeline(handle, 50)
+    
+    #User doesn't exist, or are private
+    if (listTweets == None):
+        pass
+    
+    else:
+        for tweet in listTweets:
+            score = analyzer.analyze(tweet)
+            
+            #Print score and tweet in appropriate colour
+            if score > 0.0:
+                print(colored("Score: {}\nText: {}".format(score, tweet), "green"))
+            elif score < 0.0:
+                print(colored("Score: {}\nText: {}".format(score, tweet), "red"))
+            else:
+                print(colored("Score: {}\nText: {}".format(score, tweet), "yellow"))
+    
+    
+if __name__ == "__main__":
+    main()
